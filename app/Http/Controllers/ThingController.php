@@ -38,6 +38,7 @@ class ThingController extends Controller
         ]);
 
         $path = $request->file('image')->store('things', 'public');
+        
 
         Thing::create([
             'user_id' => Auth::id(), // Ensure user_id is set correctly

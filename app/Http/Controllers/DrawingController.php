@@ -12,31 +12,25 @@ class DrawingController extends Controller
      * Store the drawing to storage and database.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'drawing_data' => 'required', // Validate the drawing data
-            'name' => 'required|string|max:255', // Validate the drawing name
-        ]);
+{
+    $request->validate([
+        'drawing_data' => 'required',
+        'name' => 'required|string|max:255',
+    ]);
 
-        // Decode the Base64 image data
-        $drawingData = $request->input('drawing_data');
-        $decodedData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $drawingData));
+    $drawingData = $request->input('drawing_data');
+    $decodedData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $drawingData));
 
-        // Create a unique filename
-        $fileName = 'drawings/' . uniqid() . '.png';
+    $fileName = 'drawings/' . uniqid() . '.png';
+    Storage::disk('public')->put($fileName, $decodedData);
 
-        // Store the file in the storage (public disk)
-        Storage::disk('public')->put($fileName, $decodedData);
+    Drawing::create([
+        'path_to_drawing' => $fileName,
+        'name' => $request->name,
+        'user_id' => auth()->id(),
+    ]);
 
-        // Save the path and user information in the database
-        Drawing::create([
-            'path_to_drawing' => $fileName,
-            'name' => $request->input('name'),
-            'user_id' => auth()->id(),
-        ]);
+    return redirect()->route('profile.edit')->with('success', 'Drawing saved successfully!');
+}
 
-        return redirect()->route('profile.edit')->with('success', 'Drawing saved successfully!');
-
-
-    }
 }

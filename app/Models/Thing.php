@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Thing extends Model
 {
     protected $fillable = [
+        'user_id',
         'path_to_img',
+        'material_id',
     ];
     public function materials()
     {

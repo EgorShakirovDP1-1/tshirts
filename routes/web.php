@@ -23,10 +23,10 @@ Route::middleware('auth')->group(function () {
     // Thing routes
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile/create', [ThingController::class, 'create'])->name('profile.create');
-    Route::post('/profile/store', [ThingController::class, 'store'])->name('profile.store');
-});
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile/create', [ThingController::class, 'create'])->name('profile.create');
+        Route::post('/profile/store', [ThingController::class, 'store'])->name('profile.store');
+    });
 
     // Drawing routes
     Route::get('/draw', function () {
