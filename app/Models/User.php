@@ -6,9 +6,52 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-class User extends Authenticatable
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+class User extends Authenticatable implements FilamentUser
 {
+    // ...
+ 
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->email, [
+            'egorsha2005@gmail.com', // Add allowed emails here
+            'owner@example.com',
+        ]);
+    }
+    //relations
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function likes() {
+        return $this->hasMany(Like::class);
+    }
+
+    public function getImageURL()
+    {
+        if ($this->avatar) {
+            return url('storage/'.$this->avatar);
+        }
+
+        return url('/images/default-profile.png');
+    }
+
+
+    public function drawings()
+    {
+        return $this->hasMany(Drawing::class);
+    }
+    
+    public function things()
+    {
+        return $this->hasMany(Thing::class);
+    }
+    // End of relations
+
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -19,8 +62,13 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'surname',
+        'username',
         'email',
         'password',
+        'avatar',
+        'address',
+        'phone',
     ];
 
     /**
