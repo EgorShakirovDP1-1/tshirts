@@ -13,5 +13,5 @@ Gallery Display:
 Add a gallery view to showcase user drawings and their associated things.
 
 Drawing Tools Expansion:
-Add shapes, text input, and different brush styles.
+Add shapes, text input, and different brush styles, object selection and parameter changing .
 
