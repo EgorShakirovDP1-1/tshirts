@@ -1,5 +1,5 @@
 to do
-🧠 Next Steps & Ideas
+## 🧠 Next Steps & Ideas
 Link Drawings to Things:
 Create a relationship where a drawing is linked to a thing when drawn on top of it.
 
