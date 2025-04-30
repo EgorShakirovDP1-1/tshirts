@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Like extends Model
 {
     protected $fillable = [
+        'drawing_id',
+        'user_id',
         'rating',
 
     ];

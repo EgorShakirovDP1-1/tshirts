@@ -8,15 +8,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 class User extends Authenticatable implements FilamentUser
 {
+    use Notifiable;
     // ...
  
     public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->email, [
             'egorsha2005@gmail.com', // Add allowed emails here
-            'owner@example.com',
+            
         ]);
     }
     //relations
@@ -40,7 +42,7 @@ class User extends Authenticatable implements FilamentUser
     }
 
 
-    public function drawings()
+    public function drawing()
     {
         return $this->hasMany(Drawing::class);
     }
@@ -69,6 +71,7 @@ class User extends Authenticatable implements FilamentUser
         'avatar',
         'address',
         'phone',
+        'last_login',
     ];
 
     /**

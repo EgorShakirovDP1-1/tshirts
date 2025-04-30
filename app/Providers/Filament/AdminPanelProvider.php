@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('Admin Panel')
+            ->brandName('GOvno')
             ->colors([
                 'primary' => Color::Amber,
             ])

@@ -8,9 +8,11 @@ class Category extends Model
 {
     protected $fillable = [
         'category_name',
+        'category_description',
+        'drawing_id',
     ];
     public function drawings()
     {
-        return $this->hasMany(Drawing::class);
+        return $this->BelongsToMany(Drawing::class);
     }
 }

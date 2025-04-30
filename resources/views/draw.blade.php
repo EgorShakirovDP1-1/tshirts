@@ -1,7 +1,24 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto mt-12 p-6 bg-white shadow-lg rounded-lg border border-gray-200">
         <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Canvas Drawing Tool 🎨</h2>
+        <div class="mt-4">
+    <label for="categories" class="block text-sm font-medium text-gray-700">Select Categories:</label>
+    <div class="mb-4">
+    <label class="block font-semibold mb-2">Choose Categories:</label>
+    <div class="grid grid-cols-2 gap-2">
+        @foreach($categories as $category)
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" name="categories[]" value="{{ $category->id }}"
+                       {{ in_array($category->id, old('categories', [])) ? 'checked' : '' }}>
+                <span>{{ $category->category_name }}</span>
+            </label>
+        @endforeach
+    </div>
+</div>
 
+
+
+</div>
         <!-- Toolbar -->
         <div class="flex flex-wrap items-center justify-center gap-6 mb-6">
             <!-- Drawing Name -->

@@ -12,7 +12,7 @@ class Drawing extends Model
         'user_id',
     ];
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -26,10 +26,29 @@ class Drawing extends Model
     }
     public function likes()
     {
-        return $this->hasMany(Likes::class);
+        return $this->hasMany(Like::class);
     }
+
+    // Count Likes
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->where('rating', 1)->count();
+    }
+
+    // Count Dislikes
+    public function getDislikesCountAttribute()
+    {
+        return $this->likes()->where('rating', -1)->count();
+    }
+
+    // Check if user has liked/disliked
+    public function userReaction()
+    {
+        return $this->likes()->where('user_id', auth()->id())->first();
+    }
+
     public function categories()
     {
-        return $this->hasMany(Category::class);
+        return $this->BelongsToMany(Category::class);
     }
 }

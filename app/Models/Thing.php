@@ -10,6 +10,7 @@ class Thing extends Model
         'user_id',
         'path_to_img',
         'material_id',
+        'drawing_id',
     ];
     public function materials()
     {
