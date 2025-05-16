@@ -31,8 +31,22 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'regex:/^\+?[0-9]{10,15}$/'],
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        
+            'password' => [
+                'required',
+                'string',
+                'confirmed', // Проверка подтверждения
+                'min:8',      // Минимум 8 символов
+                'regex:/[a-z]/',      // хотя бы одна строчная буква
+                'regex:/[A-Z]/',      // хотя бы одна заглавная
+                'regex:/[0-9]/',      // хотя бы одна цифра
+                'regex:/[@$!%*?&]/'   // хотя бы один спецсимвол
+            ],
         ]);
 
         $user = User::create([
@@ -43,8 +57,8 @@ class RegisteredUserController extends Controller
             'email_verified_at' => $request->email_verified_at,
             'password' => Hash::make($request->password),
             'avatar' => $request->avatar,
-            'address' => $request->address,
-            'phone' => $request->phone,
+           
+            'phone' => ['required', 'regex:/^\+?[0-9]{7,15}$/'], // это правило
             'remember_token' => $request->remember_token,
             'timestamps' => $request->timestamps
         ]);

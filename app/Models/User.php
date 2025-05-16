@@ -14,13 +14,10 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
     // ...
  
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return in_array($this->email, [
-            'egorsha2005@gmail.com', // Add allowed emails here
-            
-        ]);
-    }
+  public function canAccessPanel(Panel $panel): bool
+{
+    return $this->is_admin;
+}
     //relations
 
     public function comments()
@@ -69,7 +66,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'avatar',
-        'address',
+       
         'phone',
         'last_login',
     ];
@@ -96,4 +93,10 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
         ];
     }
+    public function getAvatarUrlAttribute()
+{
+    return $this->avatar 
+        ? asset('storage/' . $this->avatar) 
+        : asset('images/default-avatar.png');
+}
 }

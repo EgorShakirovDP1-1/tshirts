@@ -1,13 +1,20 @@
 <x-app-layout>
     <div class="max-w-6xl mx-auto my-10 px-4">
-        <!-- Back Button -->
-        <div class="mb-6">
-            <a href="{{ route('drawings.gallery') }}" 
-               class="inline-flex items-center px-4 py-2 border-2 border-pink-500 text-pink-500 font-semibold text-lg rounded-full hover:bg-pink-500 hover:text-white transition duration-300 shadow-lg">
-                🔙 Back to Gallery
-            </a>
-        </div>
+       <!-- Action Buttons -->
+<div class="mb-6 flex flex-wrap gap-4">
+    <a href="{{ route('drawings.index') }}" 
+       class="inline-flex items-center px-4 py-2 border-2 border-pink-500 text-pink-500 font-semibold text-lg rounded-full hover:bg-pink-500 hover:text-white transition duration-300 shadow-lg">
+        🔙 Back to Gallery
+    </a>
 
+    @can('update', $drawing)
+        <a href="{{ route('drawings.edit', $drawing->id) }}" 
+           class="inline-flex items-center px-4 py-2 border-2 border-yellow-500 text-yellow-500 font-semibold text-lg rounded-full hover:bg-yellow-500 hover:text-white transition duration-300 shadow-lg">
+            ✏️ Edit Drawing
+        </a>
+    @endcan
+</div>
+        </div>
         <!-- Drawing Details -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <!-- Image -->
@@ -77,6 +84,7 @@
     @forelse($drawing->comments as $comment)
         <div class="mb-4 p-4 border rounded-lg bg-gray-100">
         <p class="text-gray-800"><strong>{{ optional($comment->user)->username ?? 'Vitaliy Serebokin' }}</strong> said:</p>
+<img src="{{ $comment->user->avatar_url }}" class="w-12 h-12 rounded-full object-cover" alt="User Avatar">
 
 
             <p class="text-gray-700">{{ $comment->text }}</p>
@@ -100,6 +108,16 @@
                     <button class="px-5 py-3 bg-yellow-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-600 transition duration-300">
                         🔗 Share
                     </button>
+
+                    <!-- New Action Button -->
+                    <!-- filepath: resources/views/gallery/show.blade.php -->
+@auth
+    @if(auth()->id() === $drawing->user_id)
+        <a href="{{ route('drawings.parcel-map', $drawing) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+            delivery
+        </a>
+    @endif
+@endauth
                 </div>
             </div>
         </div>

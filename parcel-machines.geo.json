@@ -1,0 +1,28 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Пакоматы Рига Центр",
+          "delivery_price": "€2.50"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [24.1052, 56.9496]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "Пакоматы Даугавпилс",
+          "delivery_price": "€3.00"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [26.5359, 55.8741]
+        }
+      }
+    ]
+  }
+  

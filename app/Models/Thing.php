@@ -12,17 +12,19 @@ class Thing extends Model
         'material_id',
         'drawing_id',
     ];
-    public function materials()
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function material()
     {
         return $this->belongsTo(Material::class);
     }
+
     public function drawing()
     {
         return $this->belongsTo(Drawing::class);
-
-    }
-    public function users()
-    {
-        return $this->belongsTo(User::class);
     }
 }

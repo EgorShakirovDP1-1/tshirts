@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Show the profile edit form.
      */
     public function edit(Request $request): View
     {
@@ -22,26 +22,63 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Update profile.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $validatedData = $request->validated();
+        $user = Auth::user();
 
-        $user = $request->user();
-        $user->fill($validatedData);
+        // Validācija
+        $request->validate([
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|regex:/^\+?[0-9\s\-]{7,20}$/',
+        ]);
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+        // Jauns attēls
+        if ($request->hasFile('avatar')) {
+            // Dzēšam veco
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path;
         }
+
+        // Atjaunojam citus laukus
+        $user->name = $request->name;
+        $user->surname = $request->surname;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return back()->with('success', 'Profile updated successfully.');
     }
 
     /**
-     * Delete the user's account.
+     * Delete profile picture.
+     */
+    public function deleteAvatar(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return back()->with('success', 'Profile picture removed.');
+    }
+
+    /**
+     * Delete account.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -52,6 +89,11 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        // Dzēšam profila bildi, ja tāda ir
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
 
         $user->delete();
 

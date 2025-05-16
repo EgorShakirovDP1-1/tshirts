@@ -51,4 +51,18 @@ class Drawing extends Model
     {
         return $this->BelongsToMany(Category::class);
     }
+    public function calculatePrice()
+{
+    $base = 5.00;
+    $complexity = strlen($this->name) > 10 ? 1.5 : 1;
+
+    $deliveryPrice = $this->parcelMachine?->delivery_price ?? 0;
+
+    return round($base * $complexity + $deliveryPrice, 2);
+}
+public function parcelMachine()
+{
+    return $this->belongsTo(ParcelMachine::class);
+}
+
 }

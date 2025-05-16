@@ -17,7 +17,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-gradient-to-br from-pink-50 to-purple-100">
+    <body class="font-sans text-black-900 antialiased bg-gradient-to-br from-pink-50 to-purple-100">
 
         <div class="min-h-screen flex flex-col justify-center items-center pt-6 sm:pt-0">
       

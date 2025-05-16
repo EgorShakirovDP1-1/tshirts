@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Drawing;
 use App\Models\Category;
+use App\Models\Thing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+use Illuminate\Foundation\Validation\ValidatesRequests;
 class DrawingController extends Controller
 {
+    use AuthorizesRequests;
     public function create()
     {
         $categories = Category::all();
@@ -18,36 +22,40 @@ class DrawingController extends Controller
     
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'drawing_data' => 'required',
-            'name' => 'required|string|max:255',
-            'categories' => 'array|exists:categories,id',
-        ]);
-    
-        $drawingData = $request->input('drawing_data');
-        $decodedData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $drawingData));
-    
-        $fileName = 'drawings/' . uniqid() . '.png';
-        Storage::disk('public')->put($fileName, $decodedData);
-    
-        $drawing = Drawing::create([
-            'path_to_drawing' => $fileName,
-            'name' => $request->name,
-            'user_id' => auth()->id(),
-        ]);
-    
-        $drawing->categories()->sync($request->categories);
-    
-        return redirect()->route('drawings.edit', $drawing)->with('success', 'Drawing created! Now you can edit details.');
-    }
-    
+{
+    $request->validate([
+        'drawing_data' => 'required',
+        'name' => 'required|string|max:255',
+        'categories' => 'array|exists:categories,id',
+    ]);
+
+    $drawingData = $request->input('drawing_data');
+    $decodedData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $drawingData));
+
+    $fileName = 'drawings/' . uniqid() . '.png';
+    Storage::disk('public')->put($fileName, $decodedData);
+
+    $drawing = Drawing::create([
+        'path_to_drawing' => $fileName,
+        'name' => $request->name,
+        'user_id' => auth()->id(),
+    ]);
+    $thing = Thing::find($request->thing_id);
+$thing->drawing_id = $drawing->id;
+$thing->save();
+    // 🔁 Attach categories to the pivot table
+    $drawing->categories()->sync($request->categories);
+
+    // ✅ Redirect to editing page
+    return redirect()->route('drawings.edit', $drawing)
+        ->with('success', 'Drawing created! Now you can edit details.');
+}
 
     public function edit(Drawing $drawing)
 {
     $this->authorize('update', $drawing);
     $categories = Category::all();
-    return view('drawings.edit', compact('drawing', 'categories'));
+    return view('gallery.edit', compact('drawing', 'categories'));
 }
 
 
@@ -66,7 +74,7 @@ public function update(Request $request, Drawing $drawing)
 
     $drawing->categories()->sync($request->categories);
 
-    return redirect()->route('gallery.edit', $drawing)->with('success', 'Drawing updated successfully!');
+    return redirect()->route('drawings.update', $drawing)->with('success', 'Drawing updated successfully!');
 }
 
 
@@ -86,14 +94,24 @@ public function index(Request $request)
 {
     $categories = Category::all();
 
-    $query = Drawing::with(['user', 'categories'])
+    $query = Drawing::with(['user', 'categories', 'likes'])
         ->withCount([
             'likes as rating_sum' => function ($query) {
                 $query->select(DB::raw("SUM(rating)"));
             }
         ]);
 
-    // 🔍 Search
+    $this->applySearch($request, $query);
+    $this->applyFilter($request, $query);
+    $this->applySorting($request, $query);
+
+    $drawings = $query->paginate(12)->withQueryString();
+
+    return view('gallery.index', compact('drawings', 'categories'));
+}
+
+private function applySearch(Request $request, &$query)
+{
     if ($request->filled('query')) {
         $search = $request->input('query');
         $query->where(function ($q) use ($search) {
@@ -103,26 +121,27 @@ public function index(Request $request)
               });
         });
     }
+}
 
-    // 🧮 Filter by categories
+private function applyFilter(Request $request, &$query)
+{
     if ($request->filled('categories')) {
         $categoryIds = $request->input('categories');
         $query->whereHas('categories', function ($q) use ($categoryIds) {
             $q->whereIn('categories.id', $categoryIds);
         });
     }
+}
 
-    // 🔀 Sort
+private function applySorting(Request $request, &$query)
+{
     if ($request->input('sort') === 'rating') {
         $query->orderByDesc('rating_sum');
     } else {
         $query->orderByDesc('created_at');
     }
-
-    $drawings = $query->paginate(12)->withQueryString();
-
-    return view('gallery.index', compact('drawings', 'categories'));
 }
+
 public function show($id)
 {
     $drawing = Drawing::with('user')->findOrFail($id);
@@ -151,4 +170,14 @@ public function my()
     return view('gallery.my', compact('drawings'));
 }
 
+public function createFromThing(Thing $thing)
+{
+    $categories = Category::all();
+    return view('draw', compact('categories', 'thing'));
+}
+public function chooseThing()
+{
+    $things = Thing::whereNotNull('path_to_img')->get();
+    return view('draw.choose-thing', compact('things'));
+}
 }

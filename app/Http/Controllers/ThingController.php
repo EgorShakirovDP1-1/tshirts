@@ -25,28 +25,33 @@ class ThingController extends Controller
      * Store the uploaded PNG image and link to material.
      */
    
-    public function store(Request $request)
+    public function store(Request $request) //not working
     {
+        // dd($request->input('compressed_image')); // 🧪 Debug compressed image content
         // Check if user is authenticated
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to upload.');
         }
 
         $request->validate([
-            'image' => 'required|image|mimes:png|max:2048',
+            'compressed_image' => 'required|string',
             'material_id' => 'required|exists:materials,id',
         ]);
-
-        $path = $request->file('image')->store('things', 'public');
         
-
+        $data = $request->input('compressed_image');
+        $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data));
+        $fileName = 'things/' . uniqid() . '.png';
+        
+        Storage::disk('public')->put($fileName, $data);
+        
+        // Save to DB
         Thing::create([
-            'user_id' => Auth::id(), // Ensure user_id is set correctly
-            'path_to_img' => $path,
+            'user_id' => auth()->id(),
             'material_id' => $request->material_id,
-            
+            'path_to_img' => $fileName,
         ]);
 
-        return redirect()->route('profile.create')->with('success', 'Thing uploaded successfully!');
+        return redirect()->route('draw')->with('success', 'Thing uploaded successfully!');
     }
+    
 }
