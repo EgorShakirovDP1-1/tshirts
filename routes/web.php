@@ -8,15 +8,11 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ParcelMapController;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\DeliveryController;
 
-Route::get('/send-test-email', function () {
-    Mail::raw('This is a test email from Laravel using Mailtrap!', function ($message) {
-        $message->to('test@example.com')
-                ->subject('Test Email');
-    });
 
-    return 'Test email sent!';
-});
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -88,6 +84,15 @@ Route::delete('/profile/avatar', [\App\Http\Controllers\ProfileController::class
 
 Route::get('/drawings/{drawing}/parcel-map', [ParcelMapController::class, 'showParcelMap'])->name('drawings.parcel-map');
 Route::post('/drawings/{drawing}/choose-parcel', [ParcelMapController::class, 'chooseParcel'])->name('drawings.choose-parcel');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my-deliveries', [DeliveryController::class, 'allDeliveries'])->name('deliveries.all');
+    Route::get('/drawings/{drawing}/delivery', [DeliveryController::class, 'show'])->name('deliveries.show');
+    Route::get('/drawings/{drawing}/delivery/create', [DeliveryController::class, 'create'])->name('deliveries.create');
+    Route::post('/drawings/{drawing}/delivery', [DeliveryController::class, 'store'])->name('deliveries.store');
+    Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
+    Route::get('/deliveries/{delivery}', [DeliveryController::class, 'show'])->name('deliveries.show');
+});
 
 
 require __DIR__.'/auth.php';

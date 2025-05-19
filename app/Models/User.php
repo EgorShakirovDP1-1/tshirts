@@ -25,8 +25,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Comment::class);
     }
 
-    public function likes() {
-        return $this->hasMany(Like::class);
+    public function likes()
+    {
+        return $this->hasMany(\App\Models\Like::class);
     }
 
     public function getImageURL()

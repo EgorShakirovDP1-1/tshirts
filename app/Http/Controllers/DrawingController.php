@@ -41,8 +41,10 @@ class DrawingController extends Controller
         'user_id' => auth()->id(),
     ]);
     $thing = Thing::find($request->thing_id);
-$thing->drawing_id = $drawing->id;
-$thing->save();
+if ($thing) {
+    $thing->drawing_id = $drawing->id;
+    $thing->save();
+}
     // 🔁 Attach categories to the pivot table
     $drawing->categories()->sync($request->categories);
 
@@ -177,7 +179,9 @@ public function createFromThing(Thing $thing)
 }
 public function chooseThing()
 {
-    $things = Thing::whereNotNull('path_to_img')->get();
+    $things = Thing::whereNotNull('path_to_img')
+        ->where('user_id', auth()->id())
+        ->get();
     return view('draw.choose-thing', compact('things'));
 }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Admin\Widgets;
 
 use App\Models\Like;
 use App\Models\Comment;
@@ -14,20 +14,26 @@ class EngagementChart extends ChartWidget
 
     protected function getData(): array
     {
-        $labels = collect(range(0, 6))->map(function ($i) {
-            return Carbon::now()->subDays($i)->format('M d');
+        // Собираем даты за последние 7 дней в формате Y-m-d
+        $dates = collect(range(0, 6))->map(function ($i) {
+            return Carbon::now()->subDays($i)->format('Y-m-d');
         })->reverse()->values();
 
-        $likesData = $labels->map(function ($date) {
-            return Like::whereDate('created_at', Carbon::parse($date))->count();
+        // Для отображения на графике используем более удобный формат
+        $labels = $dates->map(function ($date) {
+            return Carbon::parse($date)->format('M d');
         });
 
-        $commentsData = $labels->map(function ($date) {
-            return Comment::whereDate('created_at', Carbon::parse($date))->count();
+        $likesData = $dates->map(function ($date) {
+            return Like::whereDate('created_at', $date)->count();
         });
 
-        $usersData = $labels->map(function ($date) {
-            return User::whereDate('created_at', Carbon::parse($date))->count();
+        $commentsData = $dates->map(function ($date) {
+            return Comment::whereDate('created_at', $date)->count();
+        });
+
+        $usersData = $dates->map(function ($date) {
+            return User::whereDate('created_at', $date)->count();
         });
 
         return [

@@ -54,6 +54,11 @@ class ParcelMapController extends Controller
     // Показывает список постаматов для выбранного рисунка
     public function showParcelMap(Drawing $drawing)
     {
+         if (!$drawing->thing()->exists()) {
+        return redirect()
+            ->route('drawings.show', $drawing)
+            ->with('error', 'Нельзя оформить доставку: рисунок не связан ни с одним объектом!');
+    }
         // Только владелец рисунка может видеть страницу выбора постамата
         if (auth()->id() !== $drawing->user_id) {
             abort(403, 'Вы не можете доставлять чужие рисунки.');

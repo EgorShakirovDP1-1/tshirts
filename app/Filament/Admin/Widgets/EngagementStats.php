@@ -12,7 +12,9 @@ class EngagementStats extends BaseWidget
 {
     protected function getStats(): array
     {
-        $topUser = User::withCount('likes')
+        $topUser = User::withCount(['likes' => function($q) {
+                $q->where('rating', 1);
+            }])
             ->orderByDesc('likes_count')
             ->first();
 
@@ -31,5 +33,4 @@ class EngagementStats extends BaseWidget
                 ->color('info'),
         ];
     }
-    
 }

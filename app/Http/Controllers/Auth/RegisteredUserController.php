@@ -33,9 +33,14 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['required', 'regex:/^\+?[0-9]{10,15}$/'],
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^(\+371\s?\d{8}|371\d{8}|\d{8})$/',
+                
+            ],
+
         
             'password' => [
                 'required',
@@ -57,10 +62,9 @@ class RegisteredUserController extends Controller
             'email_verified_at' => $request->email_verified_at,
             'password' => Hash::make($request->password),
             'avatar' => $request->avatar,
-           
-            'phone' => ['required', 'regex:/^\+?[0-9]{7,15}$/'], // это правило
+            'phone' => $request->phone,
             'remember_token' => $request->remember_token,
-            'timestamps' => $request->timestamps
+            'timestamps' => $request->timestamps,
         ]);
 
         event(new Registered($user));

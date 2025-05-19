@@ -21,7 +21,7 @@
             <div class="relative group">
                 <div class="bg-gradient-to-br from-pink-100 to-pink-200 rounded-3xl p-4 shadow-xl">
                     <img src="{{ asset('storage/' . $drawing->path_to_drawing) }}" 
-                         class="w-full h-96 object-cover rounded-2xl transform group-hover:scale-105 transition duration-500 ease-in-out"
+                         class="w-full h-96 object-contain rounded-2xl bg-white"
                          alt="{{ $drawing->name }}">
                 </div>
             </div>
@@ -39,6 +39,15 @@
                 <p class="text-xl text-gray-600 mb-6">
                     🆔 <strong>Drawing ID:</strong> #{{ $drawing->id }}
                 </p>
+@auth
+    @if(auth()->id() === $drawing->user_id && $drawing->thing->isNotEmpty())
+        <form action="{{ route('drawings.parcel-map', $drawing) }}" method="GET" class="inline">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                delivery
+            </button>
+        </form>
+    @endif
+@endauth
 
                 <!-- Action Buttons -->
                 <div class="flex justify-center md:justify-start gap-4">
@@ -66,7 +75,9 @@
         </button>
     </form>
 </div>
+
 <div class="mt-10">
+    
     <h2 class="text-2xl font-bold text-gray-800 mb-4">💬 Comments</h2>
 
     <!-- Comment Form (Only for Authenticated Users) -->
@@ -105,19 +116,11 @@
     @endforelse
 </div>
 
-                    <button class="px-5 py-3 bg-yellow-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-600 transition duration-300">
-                        🔗 Share
-                    </button>
+                    
 
                     <!-- New Action Button -->
                     <!-- filepath: resources/views/gallery/show.blade.php -->
-@auth
-    @if(auth()->id() === $drawing->user_id)
-        <a href="{{ route('drawings.parcel-map', $drawing) }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            delivery
-        </a>
-    @endif
-@endauth
+
                 </div>
             </div>
         </div>

@@ -9,16 +9,16 @@
                 <!-- Navigation Links -->
                 <div class="hidden md:flex space-x-6">
                 <x-nav-link :href="route('welcome')" :active="request()->routeIs('welcome')">
-                         home
+                         Home
                     </x-nav-link>
                     <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                         🧑 Profile
                     </x-nav-link>
                     <x-nav-link :href="route('draw')" :active="request()->routeIs('draw')">
-                        🎨 Drawings
+                        🎨 Draw
                     </x-nav-link>
                     <x-nav-link :href="route('profile.create')" :active="request()->routeIs('profile.create')">
-                        ➕ Create
+                        ➕ Upload a thing
                     </x-nav-link>
                     <x-nav-link :href="route('drawings.gallery')" :active="request()->routeIs('drawings.gallery')">
                         🖼️ Gallery
@@ -48,10 +48,10 @@
                 ⚙️ {{ __('Profile') }}
             </x-dropdown-link>
             <x-dropdown-link :href="route('draw')">
-                🖌️ {{ __('Drawings') }}
+                🖌️ {{ __('Draw') }}
             </x-dropdown-link>
             <x-dropdown-link :href="route('profile.create')">
-                ➕ {{ __('Create') }}
+                ➕ {{ __('Thing') }}
             </x-dropdown-link>
 
             <!-- Logout -->
