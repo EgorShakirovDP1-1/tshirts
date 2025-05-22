@@ -36,10 +36,10 @@
                                     {{ ucfirst($delivery->status) }}
                                 </td>
                                 <td class="px-4 py-2">
-                                    {{ $delivery->created_at->format('d.m.Y H:i') }}
+                                    {{ $delivery->created_at ? $delivery->created_at->format('d.m.Y H:i') : '—' }}
                                 </td>
                                 <td class="px-4 py-2">
-                                   <a href="{{ route('deliveries.show', $delivery->id) }}" class="text-blue-600 underline">View</a>
+                                   <a href="{{ route('deliveries.show', ['delivery' => $delivery->id]) }}" class="text-blue-600 underline">View</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -56,7 +56,7 @@
                 <p><strong>Coordinates:</strong> {{ $deliveryInfo->parcelMachine->latitude ?? '—' }}, {{ $deliveryInfo->parcelMachine->longitude ?? '—' }}</p>
                 <p><strong>Price:</strong> {{ $deliveryInfo->total_price }} €</p>
                 <p><strong>Status:</strong> {{ ucfirst($deliveryInfo->status) }}</p>
-                <p><strong>Created:</strong> {{ $deliveryInfo->created_at->format('d.m.Y H:i') }}</p>
+                <p><strong>Created:</strong> {{ $deliveryInfo->created_at ? $deliveryInfo->created_at->format('d.m.Y H:i') : '—' }}</p>
             </div>
         @endisset
     </div>

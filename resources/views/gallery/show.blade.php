@@ -31,7 +31,7 @@
                 <h1 class="text-4xl font-bold text-candy mb-5">{{ $drawing->name }}</h1>
 
                 <p class="text-xl text-gray-600 mb-3">
-                    🎨 <strong>Artist:</strong> {{ $drawing->username ?? 'Unknown' }}
+                    🎨 <strong>Artist:</strong> {{ optional($drawing->user)->username ?? 'Unknown' }}
                 </p>
                 <p class="text-xl text-gray-600 mb-3">
                     📅 <strong>Uploaded on:</strong> {{ $drawing->created_at->format('F j, Y') }}

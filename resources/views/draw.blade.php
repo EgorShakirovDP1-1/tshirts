@@ -75,24 +75,24 @@
         <!-- Clear Drawing -->
         <button onclick="clearDrawing()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded shadow">🗑️ Clear Drawing</button>
 
-        <!-- Upload Image -->
-        <input type="file" id="imageUpload" accept="image/png, image/jpeg" class="px-2 py-1 border rounded">
-
         <!-- Save Button -->
         <button onclick="saveDrawing()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded shadow">💾 Save Drawing</button>
     </div>
 
     <!-- Canvas Area -->
     <div class="relative flex justify-center">
-        <canvas id="drawingCanvas" class="border border-gray-300 rounded shadow-lg">
-            
-        </canvas>
+        <div style="position: relative; display: inline-block; width: 800px; height: 600px;">
+            <canvas id="backgroundLayer" class="border border-gray-300 rounded shadow-lg absolute left-0 top-0" style="z-index: 0; width: 100%; height: 100%;"></canvas>
+            <canvas id="drawingLayer" class="border border-gray-300 rounded shadow-lg absolute left-0 top-0" style="z-index: 1; width: 100%; height: 100%;"></canvas>
+        </div>
     </div>
 </div>
 
 <script>
-    const canvas = document.getElementById("drawingCanvas");
-    const ctx = canvas.getContext("2d");
+    const backgroundCanvas = document.getElementById("backgroundLayer");
+    const drawingCanvas = document.getElementById("drawingLayer");
+    const bgCtx = backgroundCanvas.getContext("2d");
+    const ctx = drawingCanvas.getContext("2d");
 
     let painting = false;
     let currentTool = 'freehand';
@@ -103,7 +103,19 @@
     let shapes = { startX: 0, startY: 0 };
     let history = [];
     let redoStack = [];
-    let backgroundImageData = null;
+
+    function resizeCanvases(width, height) {
+        // Устанавливаем размеры canvas
+        backgroundCanvas.width = width;
+        backgroundCanvas.height = height;
+        drawingCanvas.width = width;
+        drawingCanvas.height = height;
+        // Устанавливаем размеры стилей для корректного отображения
+        backgroundCanvas.style.width = width + "px";
+        backgroundCanvas.style.height = height + "px";
+        drawingCanvas.style.width = width + "px";
+        drawingCanvas.style.height = height + "px";
+    }
 
     function initCanvas() {
         @if(isset($thing))
@@ -114,19 +126,19 @@
             const width = img.width * scale;
             const height = img.height * scale;
 
-            canvas.width = width;
-            canvas.height = height;
+            resizeCanvases(width, height);
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, width, height);
-            backgroundImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            bgCtx.clearRect(0, 0, width, height);
+            bgCtx.drawImage(img, 0, 0, width, height);
+
+            ctx.clearRect(0, 0, width, height);
             saveState();
         };
         @else
-        canvas.width = 800;
-        canvas.height = 600;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        resizeCanvases(800, 600);
+        bgCtx.fillStyle = "#ffffff";
+        bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         saveState();
         @endif
     }
@@ -145,13 +157,13 @@
         document.getElementById('currentTool').innerText = "Freehand";
     }
 
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('click', handleTextClick);
+    drawingCanvas.addEventListener('mousedown', startDrawing);
+    drawingCanvas.addEventListener('mouseup', stopDrawing);
+    drawingCanvas.addEventListener('mousemove', draw);
+    drawingCanvas.addEventListener('click', handleTextClick);
 
     function startDrawing(e) {
-        const rect = canvas.getBoundingClientRect();
+        const rect = drawingCanvas.getBoundingClientRect();
         startX = e.clientX - rect.left;
         startY = e.clientY - rect.top;
         painting = true;
@@ -163,21 +175,27 @@
 
     function stopDrawing(e) {
         if (!painting) return;
-        const rect = canvas.getBoundingClientRect();
+        const rect = drawingCanvas.getBoundingClientRect();
         const endX = e.clientX - rect.left;
         const endY = e.clientY - rect.top;
 
-        ctx.strokeStyle = color;
         ctx.lineWidth = brushSize;
+        ctx.strokeStyle = color;
 
         if (currentTool === 'rectangle') {
+            ctx.setLineDash([]);
+            ctx.globalCompositeOperation = 'source-over';
             ctx.strokeRect(shapes.startX, shapes.startY, endX - shapes.startX, endY - shapes.startY);
         } else if (currentTool === 'circle') {
+            ctx.setLineDash([]);
+            ctx.globalCompositeOperation = 'source-over';
             const radius = Math.hypot(endX - shapes.startX, endY - shapes.startY);
             ctx.beginPath();
             ctx.arc(shapes.startX, shapes.startY, radius, 0, 2 * Math.PI);
             ctx.stroke();
         } else if (currentTool === 'line') {
+            ctx.setLineDash([]);
+            ctx.globalCompositeOperation = 'source-over';
             ctx.beginPath();
             ctx.moveTo(shapes.startX, shapes.startY);
             ctx.lineTo(endX, endY);
@@ -192,61 +210,54 @@
     function draw(e) {
         if (!painting || !['freehand', 'eraser'].includes(currentTool)) return;
 
-        const rect = canvas.getBoundingClientRect();
+        const rect = drawingCanvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
         ctx.lineWidth = brushSize;
         ctx.lineCap = "round";
 
-        // 🧼 Prevent erasing the background image
         if (currentTool === 'eraser') {
-            const pixelIndex = (Math.floor(y) * canvas.width + Math.floor(x)) * 4;
-            if (
-                backgroundImageData &&
-                backgroundImageData.data[pixelIndex] !== 255 ||
-                backgroundImageData.data[pixelIndex + 1] !== 255 ||
-                backgroundImageData.data[pixelIndex + 2] !== 255
-            ) return;
-            ctx.strokeStyle = "#ffffff";
-        } else {
-            ctx.strokeStyle = color;
-        }
-
-        if (brushStyle === 'dashed') {
-            ctx.setLineDash([10, 5]);
-        } else if (brushStyle === 'dotted') {
-            ctx.setLineDash([2, 6]);
-        } else {
+            ctx.globalCompositeOperation = 'destination-out';
             ctx.setLineDash([]);
+            ctx.strokeStyle = "rgba(0,0,0,1)";
+        } else {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = color;
+
+            if (brushStyle === 'dashed') {
+                ctx.setLineDash([10, 5]);
+            } else if (brushStyle === 'dotted') {
+                ctx.setLineDash([2, 6]);
+            } else {
+                ctx.setLineDash([]);
+            }
         }
 
         ctx.lineTo(x, y);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
+
+        ctx.globalCompositeOperation = 'source-over';
     }
 
     function handleTextClick(e) {
         if (currentTool !== 'text') return;
         const text = document.getElementById('textInput').value;
         if (!text) return alert('Please enter text before clicking!');
-        const rect = canvas.getBoundingClientRect();
+        const rect = drawingCanvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         ctx.font = `${brushSize * 4}px Arial`;
         ctx.fillStyle = color;
+        ctx.globalCompositeOperation = 'source-over';
         ctx.fillText(text, x, y);
         saveState();
     }
 
     function clearDrawing() {
-        if (backgroundImageData) {
-            ctx.putImageData(backgroundImageData, 0, 0);
-        } else {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
         saveState();
     }
 
@@ -254,7 +265,16 @@
         const name = document.getElementById("drawingName").value;
         const selectedCategories = Array.from(document.getElementById("categories").selectedOptions).map(opt => opt.value);
         if (!name) return alert("Please enter a name for your drawing.");
-        const drawingData = canvas.toDataURL("image/png");
+
+        // Сохраняем объединённое изображение
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = backgroundCanvas.width;
+        tempCanvas.height = backgroundCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(backgroundCanvas, 0, 0);
+        tempCtx.drawImage(drawingCanvas, 0, 0);
+
+        const drawingData = tempCanvas.toDataURL("image/png");
 
         const form = document.createElement('form');
         form.method = 'POST';
@@ -300,7 +320,7 @@
     }
 
     function saveState() {
-        history.push(canvas.toDataURL());
+        history.push(drawingCanvas.toDataURL());
         redoStack = [];
     }
 
@@ -315,7 +335,7 @@
             const img = new Image();
             img.src = history[history.length - 1];
             img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
                 ctx.drawImage(img, 0, 0);
             };
         }
@@ -328,7 +348,7 @@
             history.push(state);
             img.src = state;
             img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
                 ctx.drawImage(img, 0, 0);
             };
         }

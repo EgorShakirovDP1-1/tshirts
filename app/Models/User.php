@@ -100,4 +100,13 @@ class User extends Authenticatable implements FilamentUser
         ? asset('storage/' . $this->avatar) 
         : asset('images/default-avatar.png');
 }
+public function deliveries()
+{
+    return $this->hasMany(Delivery::class);
+
 }
+    // public function parcelMachine()
+    // {
+    //     return $this->hasMany(ParcelMachine::class);
+    // }
+} 

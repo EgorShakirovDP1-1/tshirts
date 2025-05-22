@@ -19,12 +19,6 @@ class ParcelMachine extends Model
         return $this->hasMany(Delivery::class);
     }
 
-    public function things()
-    {
-        return $this->hasMany(Thing::class);
-    }
-   public function drawings()
-   {
-       return $this->hasMany(Drawing::class);
-   }
+
+  
 }

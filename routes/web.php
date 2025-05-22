@@ -87,11 +87,11 @@ Route::post('/drawings/{drawing}/choose-parcel', [ParcelMapController::class, 'c
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/my-deliveries', [DeliveryController::class, 'allDeliveries'])->name('deliveries.all');
-    Route::get('/drawings/{drawing}/delivery', [DeliveryController::class, 'show'])->name('deliveries.show');
+    Route::get('/deliveries/{delivery}', [DeliveryController::class, 'show'])->name('deliveries.show');
+    Route::get('/drawings/{drawing}/delivery', [DeliveryController::class, 'show'])->name('deliveries.show.drawing');
     Route::get('/drawings/{drawing}/delivery/create', [DeliveryController::class, 'create'])->name('deliveries.create');
     Route::post('/drawings/{drawing}/delivery', [DeliveryController::class, 'store'])->name('deliveries.store');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
-    Route::get('/deliveries/{delivery}', [DeliveryController::class, 'show'])->name('deliveries.show');
 });
 
 

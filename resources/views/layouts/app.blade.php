@@ -31,5 +31,7 @@
         <main class="py-6">
             {{ $slot }}
         </main>
+
+        @include('layouts.bottom_menu')
     </body>
 </html>

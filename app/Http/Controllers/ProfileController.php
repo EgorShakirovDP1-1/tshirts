@@ -28,14 +28,18 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Validācija
         $request->validate([
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'name' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|regex:/^\+?[0-9\s\-]{7,20}$/',
+            'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^(\+371\s?\d{8}|371\d{8}|\d{8})$/',
+            ],
         ]);
 
         // Jauns attēls
