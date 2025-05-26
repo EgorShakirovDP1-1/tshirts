@@ -353,6 +353,14 @@
             };
         }
     }
+
+    document.getElementById('colorPicker').addEventListener('input', function(e) {
+        color = e.target.value;
+    });
+
+    document.getElementById('brushSize').addEventListener('input', function(e) {
+        brushSize = e.target.value;
+    });
 </script>
 
 </x-app-layout>

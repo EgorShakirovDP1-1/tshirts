@@ -48,6 +48,41 @@ const previewCanvas = document.getElementById('previewCanvas');
 const ctx = previewCanvas.getContext('2d');
 const compressedImageInput = document.getElementById('compressedImageInput');
 
+// Показывать превью при выборе файла
+imageInput.addEventListener('change', function () {
+    const file = imageInput.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Unsupported file format!');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            const maxSize = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxSize || height > maxSize) {
+                const ratio = Math.min(maxSize / width, maxSize / height);
+                width *= ratio;
+                height *= ratio;
+            }
+
+            previewCanvas.width = width;
+            previewCanvas.height = height;
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
 uploadForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -86,8 +121,6 @@ uploadForm.addEventListener('submit', function (e) {
                 const finalReader = new FileReader();
                 finalReader.onloadend = function () {
                     compressedImageInput.value = finalReader.result;
-
-                    // ✅ Now submit the form
                     uploadForm.submit();
                 };
                 finalReader.readAsDataURL(blob);

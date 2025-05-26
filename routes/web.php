@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/drawings/{drawing}/delivery', [DeliveryController::class, 'store'])->name('deliveries.store');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
 });
-
+Route::redirect('/profile', '/profile/edit');
 
 require __DIR__.'/auth.php';
+

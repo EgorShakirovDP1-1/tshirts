@@ -1,7 +1,7 @@
 <!-- filepath: resources/views/gallery/parcel-map.blade.php -->
 <x-app-layout>
     <div class="container mx-auto my-5 px-4">
-        <h2 class="text-2xl font-bold mb-4">Выберите постамат для доставки рисунка "{{ $drawing->name }}"</h2>
+        <h2 class="text-2xl font-bold mb-4">Select a parcel machine for delivering the drawing "{{ $drawing->name }}"</h2>
         <ul class="mb-8">
             @foreach($parcelMachines as $machine)
                 <li class="mb-3 p-3 border rounded flex justify-between items-center">
@@ -21,9 +21,9 @@
             @endforeach
         </ul>
         <div class="flex gap-4">
-            <a href="{{ route('drawings.show', $drawing) }}" class="text-blue-500 underline">Назад к рисунку</a>
+            <a href="{{ route('drawings.show', $drawing) }}" class="text-blue-500 underline">Back to drawing</a>
             <a href="{{ route('deliveries.all') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold">
-                Все доставки
+                All deliveries
             </a>
         </div>
     </div>

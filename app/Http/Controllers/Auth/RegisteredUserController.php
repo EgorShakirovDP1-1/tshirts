@@ -37,8 +37,8 @@ class RegisteredUserController extends Controller
                 'required',
                 'string',
                 'max:20',
-                'regex:/^(\+371\s?\d{8}|371\d{8}|\d{8})$/',
-                
+                'regex:/^\+?\d{7,15}$/', // Allows optional +, 7-15 digits
+        
             ],
 
         

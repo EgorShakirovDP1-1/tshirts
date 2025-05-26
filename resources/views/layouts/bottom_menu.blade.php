@@ -12,6 +12,10 @@
             <i class="bi bi-truck text-yellow-500 text-xl"></i>
             <span>Deliveries</span>
         </a>
+        <a href="{{ route('drawings.my') }}" class="flex flex-col items-center py-2 hover:text-green-600 transition duration-200">
+            <i class="bi bi-person-badge text-green-500 text-xl"></i>
+            <span>My Drawings</span>
+        </a>
         <a href="{{ route('profile.edit') }}" class="flex flex-col items-center py-2 hover:text-purple-600 transition duration-200">
             <i class="bi bi-person text-purple-500 text-xl"></i>
             <span>Profile</span>
