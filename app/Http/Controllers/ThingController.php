@@ -43,13 +43,19 @@ class ThingController extends Controller
         $fileName = 'things/' . uniqid() . '.png';
         
         Storage::disk('public')->put($fileName, $data);
-        
+
         // Save to DB
-        Thing::create([
+        $thing = Thing::create([
             'user_id' => auth()->id(),
             'material_id' => $request->material_id,
             'path_to_img' => $fileName,
         ]);
+
+        // Проверка доступности файла и автудаление, если не найден
+        if (!Storage::disk('public')->exists($fileName)) {
+            $thing->delete();
+            return redirect()->route('draw')->with('error', 'Image upload failed, thing was not saved.');
+        }
 
         return redirect()->route('draw')->with('success', 'Thing uploaded successfully!');
     }

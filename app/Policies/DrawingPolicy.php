@@ -11,17 +11,17 @@ class DrawingPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny($user)
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Drawing $drawing): bool
+    public function view($user, $drawing)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -46,7 +46,7 @@ class DrawingPolicy
      */
     public function delete(User $user, Drawing $drawing): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**

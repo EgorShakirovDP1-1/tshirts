@@ -45,13 +45,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware('auth')->group(function () {
     // Profile routes
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    // Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+    Route::get('/profile', function () {
+        return redirect()->route('profile.edit');
+    });
 
- 
 
     // Drawing routes
  
@@ -93,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/drawings/{drawing}/delivery', [DeliveryController::class, 'store'])->name('deliveries.store');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
 });
-Route::redirect('/profile', '/profile/edit');
+// Route::redirect('/profile', '/profile/edit');
 
 require __DIR__.'/auth.php';
 

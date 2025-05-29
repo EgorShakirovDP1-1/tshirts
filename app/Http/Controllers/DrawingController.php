@@ -33,13 +33,20 @@ class DrawingController extends Controller
     $decodedData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $drawingData));
 
     $fileName = 'drawings/' . uniqid() . '.png';
-    Storage::disk('public')->put($fileName, $decodedData);
+    \Storage::disk('public')->put($fileName, $decodedData);
 
     $drawing = Drawing::create([
         'path_to_drawing' => $fileName,
         'name' => $request->name,
         'user_id' => auth()->id(),
     ]);
+
+    // Проверка доступности файла и автудаление, если не найден
+    if (!\Storage::disk('public')->exists($fileName)) {
+        $drawing->delete();
+        return redirect()->route('draw')->with('error', 'Image upload failed, drawing was not saved.');
+    }
+
     $thing = Thing::find($request->thing_id);
 if ($thing) {
     $thing->drawing_id = $drawing->id;

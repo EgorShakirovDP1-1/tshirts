@@ -48,7 +48,10 @@ class ThingResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->sortable(),
-                ImageColumn::make('path_to_img')->disk('public'),
+                ImageColumn::make('path_to_img')
+                    ->disk('public')
+                    ->label('Image')
+                    ->height(60), // по желанию
                 TextColumn::make('material.material')->label('Material')->sortable(),
                 TextColumn::make('drawing.name')->label('Drawing')->searchable(),
                 TextColumn::make('drawing.id')->label('Drawing ID')->sortable(),

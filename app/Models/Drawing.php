@@ -49,7 +49,7 @@ class Drawing extends Model
 
     public function categories()
     {
-        return $this->BelongsToMany(Category::class);
+        return $this->belongsToMany(Category::class);
     }
     public function parcelMachine()
 {
