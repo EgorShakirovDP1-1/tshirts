@@ -15,7 +15,7 @@
                         </a>
                         <div class="text-center p-4">
                             <h5 class="text-candy text-xl font-semibold mb-2">{{ $drawing->name }}</h5>
-                            <p class="text-sm text-gray-500">Uploaded on {{ $drawing->created_at->format('F j, Y') }}</p>
+                            <p class="text-sm text-gray-500">Uploaded on {{ $drawing->created_at ? $drawing->created_at->format('d.m.Y') : 'from the beginning of time' }}</p>
                         </div>
                     </div>
                 </div>

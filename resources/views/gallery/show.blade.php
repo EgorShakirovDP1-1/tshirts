@@ -18,11 +18,15 @@
         <!-- Drawing Details -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <!-- Image -->
-            <div class="relative group">
-                <div class="bg-gradient-to-br from-pink-100 to-pink-200 rounded-3xl p-4 shadow-xl">
-                    <img src="{{ asset('storage/' . $drawing->path_to_drawing) }}" 
-                         class="w-full h-96 object-contain rounded-2xl bg-white"
-                         alt="{{ $drawing->name }}">
+            <div class="relative group flex justify-center items-center">
+                <div class="bg-gradient-to-br from-pink-100 to-pink-200 rounded-3xl p-3 shadow-xl flex justify-center items-center"
+                     style="max-width: 420px; max-height: 420px; width: 100%; height: 100%;">
+                    <div class="bg-white rounded-2xl shadow-inner flex justify-center items-center w-full h-full"
+                         style="padding: 0; display: flex;">
+                        <img src="{{ asset('storage/' . $drawing->path_to_drawing) }}"
+                             class="w-full h-full max-w-[380px] max-h-[380px] object-contain rounded-2xl image-hover transition-transform duration-300"
+                             alt="{{ $drawing->name }}">
+                    </div>
                 </div>
             </div>
 
@@ -34,18 +38,20 @@
                     🎨 <strong>Artist:</strong> {{ optional($drawing->user)->username ?? 'Unknown' }}
                 </p>
                 <p class="text-xl text-gray-600 mb-3">
-                    📅 <strong>Uploaded on:</strong> {{ $drawing->created_at->format('F j, Y') }}
+                    📅 <strong>Uploaded on:</strong> {{ $drawing->created_at ? $drawing->created_at->format('d.m.Y') : 'from the beginning of time' }}
                 </p>
                 <p class="text-xl text-gray-600 mb-6">
                     🆔 <strong>Drawing ID:</strong> #{{ $drawing->id }}
                 </p>
 @auth
     @if(auth()->id() === $drawing->user_id && $drawing->thing->isNotEmpty())
-        <form action="{{ route('drawings.parcel-map', $drawing) }}" method="GET" class="inline">
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                delivery
-            </button>
-        </form>
+        <div class="mb-6 flex justify-center md:justify-start">
+            <form action="{{ route('drawings.parcel-map', $drawing) }}" method="GET" class="inline">
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    delivery
+                </button>
+            </form>
+        </div>
     @endif
 @endauth
 

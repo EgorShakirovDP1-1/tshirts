@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ParcelMachine;
-
+use Illuminate\Support\Facades\DB;
 class ParcelMachineSeeder extends Seeder
 {
     /**

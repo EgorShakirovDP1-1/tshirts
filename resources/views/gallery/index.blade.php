@@ -66,8 +66,13 @@
                                 <div>
                                     <h5 class="text-candy text-2xl font-bold mb-2 truncate">{{ $drawing->name }}</h5>
                                     <p class="text-sm text-gray-500 mb-1">👤 <span class="font-medium">{{ $drawing->user->username ?? 'Unknown' }}</span></p>
-                                    <p class="text-sm text-gray-500 mb-1">⭐ Rating: <span class="font-semibold">{{ $drawing->likes_count ?? 'N/A' }}</span></p>
-                                    <p class="text-sm text-gray-400">📅 {{ $drawing->created_at->format('d.m.Y') }}</p>
+                                    <p class="text-sm text-gray-500 mb-1">
+                                        ⭐ Rating: <span class="font-semibold">{{ $drawing->rating_sum ?? 'N/A' }}</span>
+                                    </p>
+                                    <p class="text-sm text-gray-400">
+                                        📅
+                                        {{ $drawing->created_at ? $drawing->created_at->format('d.m.Y') : 'from the beginning of time' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -5,7 +5,17 @@
         <form action="{{ route('drawings.update', $drawing->id) }}" method="POST">
             @csrf
             @method('PUT')
-
+            <div class="relative group flex justify-center items-center mb-8">
+                <div class="bg-gradient-to-br from-pink-100 to-pink-200 rounded-3xl p-3 shadow-xl flex justify-center items-center"
+                     style="max-width: 420px; max-height: 420px; width: 100%; height: 100%;">
+                    <div class="bg-white rounded-2xl shadow-inner flex justify-center items-center w-full h-full"
+                         style="padding: 0; display: flex;">
+                        <img src="{{ asset('storage/' . $drawing->path_to_drawing) }}"
+                             class="w-full h-full max-w-[380px] max-h-[380px] object-contain rounded-2xl"
+                             alt="{{ $drawing->name }}">
+                    </div>
+                </div>
+            </div>
             <!-- Name -->
             <div class="mb-4">
                 <label class="block font-semibold text-lg text-gray-700">Drawing Name</label>
